@@ -1,12 +1,13 @@
 import json
+import createOutput as co
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
 # Replace with your actual Client ID and Client Secret
 with open('APICodes.json') as codeFile:
     codes = json.load(codeFile)
-    CLIENT_ID = codes['clientid']
-    CLIENT_SECRET = codes['secretid']
+    CLIENT_ID = codes[0]['clientid']
+    CLIENT_SECRET = codes[0]['secretid']
 
 
 # Authenticate with Spotify
@@ -34,10 +35,11 @@ def dataFileRead(inFileName):
         allSongURI.add(value['spotify_track_uri'])
         #trackTime = sp.track(value['spotify_track_uri'])['duration_ms']
 
-    print(len(allSongURI))
+    print(len(allSongURI), "\n\n")
 
     for value in allSongURI:
-        songDatabase.update(value, sp.track(value))
+        print(value)
+        songDatabase.update({value: sp.track(value)})
     print(songDatabase)
     return True
 
