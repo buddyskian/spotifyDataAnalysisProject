@@ -1,2 +1,4 @@
 *.json
 *.zip
+.cache
+ReadMeFirst_ExtendedStreamingHistory.pdf
