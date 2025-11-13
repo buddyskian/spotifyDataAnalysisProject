@@ -41,18 +41,18 @@ middleStrSkeleton = """<div class="song-row">
 #SongAlbumCover::URL
 #Data::string/int/double/float (will be cast to string)
 #DataType::String
-def createOutputFile(inSongs, DataType="Song Length"):
+def createOutputFile(inSongs, DataType="Songs", outFileName="createdOutput", sortBy=4):
+    inSongs = sorted(inSongs, key=lambda x: x[sortBy])
     outputMiddleStr = ""
     for song in inSongs:
         outputMiddleStr += middleStrSkeleton.format(song[3], song[0], song[2], song[1], str(song[4]))
-    with open("createdOutput.html", 'w') as f:
+    with open(outFileName+".html", 'w') as f:
         f.write(outputStartStr.format(DataType)+outputMiddleStr+outputEndStr)
     return
 
 
 #TesterCode to make sure that this works
-"""
+
 testList =  [("Bags", "Immunity", "Clairo", "https://upload.wikimedia.org/wikipedia/en/5/56/Clairo_-_Immunity.png", "3:20"),
              ("Alewife", "Immunity", "Clairo", "https://upload.wikimedia.org/wikipedia/en/5/56/Clairo_-_Immunity.png", "4:10") ]
-createOutputFile(testList)
-"""
+createOutputFile(testList, "Songs", "createdOutput", 0)
