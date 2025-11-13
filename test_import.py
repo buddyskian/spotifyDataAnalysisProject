@@ -23,6 +23,7 @@ def dataFileRead(inFileName):
     parsedData = dict()
     #set that will be used for the api batch call
     allSongURI = set()
+    songDatabase = dict()
     for value in dataRead:
         curTrack = value['master_metadata_track_name']
         if (value['spotify_track_uri'] is None or value['spotify_track_uri'] == None) : continue
@@ -34,8 +35,10 @@ def dataFileRead(inFileName):
         #trackTime = sp.track(value['spotify_track_uri'])['duration_ms']
 
     print(len(allSongURI))
-    allSongData = sp.tracks(allSongURI)
-    print(allSongData)
+
+    for value in allSongURI:
+        songDatabase.update(value, sp.track(value))
+    print(songDatabase)
     return True
 
 #main
