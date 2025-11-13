@@ -3,7 +3,6 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
 # Replace with your actual Client ID and Client Secret
-
 with open('APICodes.json') as codeFile:
     codes = json.load(codeFile)
     CLIENT_ID = codes['clientid']
@@ -22,9 +21,9 @@ def dataFileRead(inFileName):
     parsedData = dict()
     for value in dataRead:
         curTrack = value['master_metadata_track_name']
-        if value['spotify_track_uri'] == 'null' : continue
+        if (value['spotify_track_uri'] is None or value['spotify_track_uri'] == None) : continue
         parsedData.update({curTrack: parsedData.get(curTrack, 0)+1})
-        print(curTrack)
+        print(curTrack, ":", value['spotify_track_uri'])
         trackTime = sp.track(value['spotify_track_uri'])['duration_ms']
         print(curTrack, ":", trackTime)
 
