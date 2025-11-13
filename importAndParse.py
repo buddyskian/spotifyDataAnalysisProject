@@ -1,8 +1,8 @@
 import json
 import createOutput as co
 
-#RATE LIMIT IS 50 SONGS PER BATCH CALL
-#MAX CALLS IS 30 PER SECOND, THROTTLE FOR LARGE SCALE
+# RATE LIMIT IS 50 SONGS PER BATCH CALL
+# MAX CALLS IS 30 PER SECOND, THROTTLE FOR LARGE SCALE
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -19,7 +19,7 @@ auth_manager = SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIEN
 sp = spotipy.Spotify(auth_manager=auth_manager)
 
 
-#TODO: fix this documentation stub
+# TODO: fix this documentation stub
 def dataFileRead(inFileName):
     """
     This function takes an input json file and returns the data on every indvidual steam.
@@ -34,25 +34,25 @@ def dataFileRead(inFileName):
     with open(inFile) as f:
         dataRead = json.load(f)
     
-    #dict will hold information on every stream in the input file, indexed by streamdate
+    # dict will hold information on every stream in the input file, indexed by streamdate
     streams = dict()
 
     for value in dataRead:
-        #if stream is not a song, next stream
+        # if stream is not a song, next stream
         if (value['spotify_track_uri'] is None or value['spotify_track_uri'] == None) : continue
 
-        #add relevant stream information to streams dict
+        # add relevant stream information to streams dict
         streamDate = value['ts']
         streamURI = value['spotify_track_uri']
         streamDuration = int(value['ms_played'])
         skipped = bool(value['skipped'])
-        streams.update({streamDate:(streamURI, streamDuration, skipped)})
+        streams.update({streamDate:{'uri':streamURI, 'duration':streamDuration, 'skip':skipped}})
             
     return streams
 
 
-#TODO: Throttle this function to avoid hitting the API call limit
-#TODO: finish this documentation stub
+# TODO: Throttle this function to avoid hitting the API call limit
+# TODO: finish this documentation stub
 def quereyAPI(streamData):
     """
     Given streamData this function queries the spotipy API and returns a dict containing on
@@ -62,10 +62,10 @@ def quereyAPI(streamData):
     allSongURI = set()
 
     for stream in streamData.values():
-        allSongURI.add(stream[0])
+        allSongURI.add(stream['uri'])
     
-    #While this batch call avoids redundant calls, it doesn't limit itself to 50 calls at a time
-    #TODO: HERE IS THE PLACE TO THROTTLE
+    # While this batch call avoids redundant calls, it doesn't limit itself to 50 calls at a time
+    # TODO: HERE IS THE PLACE TO THROTTLE
     songImports = sp.tracks(allSongURI)['tracks']
     
     songDatabase = dict()
@@ -84,7 +84,28 @@ def quereyAPI(streamData):
 
     return songDatabase
 
+# TODO: Write documentation stub for this function.
+def organizeByPercentage(streamData:dict, songData:dict):
+    """
+    Stub
+    """
+    # this will be passed to the helper function to create the html code
+    songPercentagesDict = dict()
+    for stream in streamData.values():
+        song = songData[stream['uri']]
+        curPercent = songPercentagesDict.get(stream['uri'], 0.0)
+        curPercent += float(song['duration'])/float(stream['duration'])
+        songPercentagesDict.update({stream['uri']:curPercent})
+    
+    songPercentages = []
+    for uri, percent in songPercentagesDict.items():
+        curSong = songData[uri]
+        print(percent, " : ", str(int(percent)))
+        songPercentages.append((curSong['name'], curSong['artists'], curSong['album'], curSong['coverURL'], (int(percent))))
+    songPercentages = sorted(songPercentages, key=lambda x: x[4], reverse=True)
+    co.createOutputFile(songPercentages, "Songs by Total Percentage Listened", "percentOutput")
 #main
 streamData  = dataFileRead('test')
 songData = quereyAPI(streamData)
+organizeByPercentage(streamData, songData)
 
