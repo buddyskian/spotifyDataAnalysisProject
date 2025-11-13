@@ -1,0 +1,140 @@
+/*
+    STYLE SHEET FOR FINAL OUTPUT
+    AI GENERATED
+*/
+
+
+/* ============================
+   THEME VARIABLES
+============================ */
+:root {
+  --bg-color: #050814;
+  --card-color: #111827;
+  --accent-color: #1db954;
+  --accent-soft: #22c55e33;
+  --text-color: #f9fafb;
+  --muted-text: #9ca3af;
+  --border-subtle: #1f2937;
+}
+
+/* ============================
+   GLOBAL SETTINGS
+============================ */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #0b1220 0, var(--bg-color) 55%);
+  color: var(--text-color);
+  font-family: "Maple Mono", "SF Mono", "JetBrains Mono", ui-monospace,
+               Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+}
+
+/* ============================
+   MAIN APP CONTAINER
+============================ */
+.app-shell {
+  width: 100%;
+  max-width: 900px;
+  background: #020617aa;
+  border-radius: 1.5rem;
+  border: 1px solid var(--border-subtle);
+  padding: 2rem;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(16px);
+}
+
+/* ============================
+   HEADER AREA
+============================ */
+.app-header {
+  margin-bottom: 2rem;
+}
+
+.app-header h1 {
+  font-size: 1.9rem;
+  letter-spacing: 0.06em;
+}
+
+.app-header p {
+  color: var(--muted-text);
+  margin-top: 0.3rem;
+}
+
+/* ============================
+   SONG LIST PANEL
+============================ */
+.song-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.song-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--card-color);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  transition: background 0.2s, border 0.2s;
+}
+
+.song-row:hover {
+  border-color: var(--accent-soft);
+  background: radial-gradient(circle at left, #22c55e0f 0, transparent 60%);
+}
+
+/* Album Art */
+.song-cover {
+  width: 64px;
+  height: 64px;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  border: 1px solid var(--border-subtle);
+}
+
+/* Song Info (middle area) */
+.song-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.song-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.song-artist {
+  font-size: 0.85rem;
+  color: var(--muted-text);
+}
+
+/* Right-aligned data (duration, plays, popularity, etc.) */
+.song-data {
+  font-size: 0.9rem;
+  color: var(--accent-color);
+  font-weight: 600;
+  text-align: right;
+  min-width: 50px;
+}
+
+/* Utility classes */
+.text-accent {
+  color: var(--accent-color);
+}
+
+.text-muted {
+  color: var(--muted-text);
+}
