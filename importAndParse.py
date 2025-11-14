@@ -1,9 +1,13 @@
+#TODO: Clean this file up
+
+
 #DEFAULT PACKAGE IMPORTS
 import json
 
 #FILE IMPORTS
 import createOutput as co
 import cacheManager as sCache
+import queryTracker as qt
 
 # RATE LIMIT IS 50 SONGS PER BATCH CALL
 # MAX CALLS IS 30 PER SECOND, THROTTLE FOR LARGE SCALE
@@ -18,9 +22,14 @@ with open('APICodes.json') as codeFile:
     CLIENT_ID = codes[2]['clientid']
     CLIENT_SECRET = codes[2]['secretid']
 
+#GLOBAL QUEREY MANAGER
+qMan = qt.QuereyManager()
+
 # Authenticate with Spotify
 auth_manager = SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
 sp = spotipy.Spotify(auth_manager=auth_manager)
+
+
 
 
 def dataFileRead(inFileName):
@@ -54,6 +63,8 @@ def dataFileRead(inFileName):
     return streams
 
 
+
+
 # TODO: finish this documentation stub
 def parseStreams(streamData:dict):
     """
@@ -83,6 +94,8 @@ def parseStreams(streamData:dict):
 
 
 
+
+
 def quereyAPI(uris:set):
     """
     Queries the api for a batch call of track information.
@@ -99,6 +112,7 @@ def quereyAPI(uris:set):
         return {}
 
     #ACTUAL QUEREY, needs to be throttled
+    qMan.waitUntilGoodToCommit()
     songImports = sp.tracks(uris)['tracks']
     
     songData = dict()
@@ -107,18 +121,26 @@ def quereyAPI(uris:set):
     for song in songImports:
         uri = song['uri']
         name = song['name']
+        if(name == None): continue
         albumName = song['album']['name']
         songDuration = int(song['duration_ms'])
         artistsString = ""
         for artist in song['artists']:
             artistsString += artist['name'] + ", "
         artistsString = artistsString[:-2]
-        albumCoverURL = song['album']['images'][0]['url']
+        print(name, "from", albumName, "by", artistsString)
+        if(len(song['album']['images'])==0):
+            #default url for when songs have no album cover
+            albumCoverURL = ""
+        else :
+            albumCoverURL = song['album']['images'][0]['url']
         songData.update({ uri:{'name':name, 'album':albumName, 'artists':artistsString, 'coverURL':albumCoverURL, 'duration':songDuration} })
 
 
     sCache.updateCache(songData)
     return songData
+
+
 
 
 def organizeByPercentage(streamData:dict, songData:dict):
@@ -134,23 +156,33 @@ def organizeByPercentage(streamData:dict, songData:dict):
     # this will be passed to the helper function to create the html code
     songPercentagesDict = dict()
     for stream in streamData.values():
+        #HACK: make sure to add a cache of bad uri's in future
+        if(stream['uri'] not in songData.keys()): continue
         song = songData[stream['uri']]
         curPercent = songPercentagesDict.get(stream['uri'], 0.0)
-        curPercent += float(song['duration'])/float(stream['duration'])
+        if(float(stream['duration']) != 0):
+            curPercent += float(stream['duration'])/float(song['duration'])
         songPercentagesDict.update({stream['uri']:curPercent})
     
     songPercentages = []
     for uri, percent in songPercentagesDict.items():
         curSong = songData[uri]
-        print(percent, " : ", str(int(percent)))
         songPercentages.append((curSong['name'], curSong['artists'], curSong['album'], curSong['coverURL'], (int(percent))))
     songPercentages = sorted(songPercentages, key=lambda x: x[4], reverse=True)
     co.createOutputFile(songPercentages, "Songs by Total Percentage Listened", "percentOutput")
+
+
 #main
+streamData = dataFileRead('Streaming_History_Audio_2025_16')
+songData   = dict(parseStreams(streamData))
+streamData = (dataFileRead('Streaming_History_Audio_2024-2025_15'))
+songData   = dict(songData.update(parseStreams(streamData)))
+streamData = dataFileRead('Streaming_History_Audio_2023-2024_14')
+print(streamData)
+songData   = songData.update(parseStreams(streamData))
 
 
 
-streamData  = dataFileRead('test')
-songData = parseStreams(streamData)
-organizeByPercentage(streamData, songData)
+
+#organizeByPercentage(streamData, songData)
 
