@@ -65,7 +65,7 @@ def quereyAPI(streamData):
         allSongURI.add(stream['uri'])
     
     # While this batch call avoids redundant calls, it doesn't limit itself to 50 calls at a time
-    # TODO: HERE IS THE PLACE TO THROTTLE
+    # TODO: HERE IS THE PLACE TO THROTTLE - MAKE A REFERENCEABLE CACHE FILE TO ALLOW FOR IGNORING OF REPEAT DATA
     songImports = sp.tracks(allSongURI)['tracks']
     
     songDatabase = dict()
@@ -87,7 +87,13 @@ def quereyAPI(streamData):
 # TODO: Write documentation stub for this function.
 def organizeByPercentage(streamData:dict, songData:dict):
     """
-    Stub
+    This function creates an output html file that holds all songs in the given data using the
+    imported song data. The songs in the html file are organized by total percentage of song
+    listening time (ie if a song is 3 minutes and it was listened to for a total of 9 minutes 
+    the total % time would be 300).
+    Args:
+        streamData (dict): Data on all streams as parsed by function dataFileRead()
+        songData (dict): Cached data on all streams as created and managed by INSERT CACHE MANAGER HERE
     """
     # this will be passed to the helper function to create the html code
     songPercentagesDict = dict()
