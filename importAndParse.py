@@ -157,11 +157,12 @@ def organizeByPercentage(streamData:dict, songData:dict):
     songPercentagesDict = dict()
     for stream in streamData.values():
         #HACK: make sure to add a cache of bad uri's in future
-        if(stream['uri'] not in songData.keys()): continue
+        print(stream['uri'])
+        if (stream['uri'] not in songData.keys()): continue
         song = songData[stream['uri']]
         curPercent = songPercentagesDict.get(stream['uri'], 0.0)
-        if(float(stream['duration']) != 0):
-            curPercent += float(stream['duration'])/float(song['duration'])
+        if(float(song['duration']) != 0):
+            curPercent += (float(stream['duration'])/float(song['duration']))*100
         songPercentagesDict.update({stream['uri']:curPercent})
     
     songPercentages = []
@@ -173,13 +174,11 @@ def organizeByPercentage(streamData:dict, songData:dict):
 
 
 #main
-streamData = dataFileRead('Streaming_History_Audio_2025_16')
-songData   = dict(parseStreams(streamData))
-streamData = (dataFileRead('Streaming_History_Audio_2024-2025_15'))
-songData   = dict(songData.update(parseStreams(streamData)))
-streamData = dataFileRead('Streaming_History_Audio_2023-2024_14')
-print(streamData)
-songData   = songData.update(parseStreams(streamData))
+streamData = dataFileRead("test")
+songData = parseStreams(streamData)
+for val in streamData.values():
+    print(val)
+organizeByPercentage(streamData, songData)
 
 
 
